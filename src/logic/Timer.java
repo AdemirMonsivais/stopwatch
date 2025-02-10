@@ -2,57 +2,73 @@ package logic;
 
 import utils.Time;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 public class Timer implements Runnable{
-    private Time time;
-    private JLabel timeLabel;
+    private final Time time;
+    private final JLabel timeLabel;
 
-    private boolean isRunning = true;
-    private boolean isPaused = false;
+    private final TimerManager timerManager;
 
-    public Timer(Time time, JLabel timeLabel){
+
+    public Timer(Time time, JLabel timeLabel, TimerManager timerManager){
         this.time = time;
         this.timeLabel = timeLabel;
+        this.timerManager = timerManager;
     }
 
     @Override
     public void run() {
-        while(true){
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                /*
-                System.out.println(Thread.currentThread().isInterrupted());
-                if(Thread.currentThread().isInterrupted()){ //why doesn't change the internal flag status
-                    System.err.println(Thread.currentThread().getName());
-                    System.out.println(Thread.currentThread().isInterrupted());
-                    Thread.currentThread().interrupt();
+        int iterations = 0;
+        while(!Thread.currentThread().isInterrupted()){
+            synchronized (timerManager.getLock()) {
+                while (timerManager.isPaused()) {
+                    try {
+                        timerManager.getLock().wait();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
                 }
-                Thread.interrupted();
-                 */
-                time.setTime(0,0,0);
-                timeLabel.setText(Time.format(time));
-                timeLabel.revalidate();
-                timeLabel.repaint();
-
-                throw new RuntimeException();
             }
 
-            time.setSeconds(time.getSeconds()+1);
+            iterations++;
+            if (iterations >= 10){
+                increment();
+                updateLabel();
+                iterations = 0;
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+
+
+        }
+    }
+
+    public void increment(){
+
+        time.setSeconds(time.getSeconds()+1);
+    }
+    public void reset(){
+        time.setTime(0,0,0);
+    }
+
+
+
+    public void updateLabel(){
+        SwingUtilities.invokeLater(()->{
             timeLabel.setText(Time.format(time));
 
             timeLabel.revalidate();
             timeLabel.repaint();
-        }
-
-
-
-
+        });
     }
-/*
-    public void pause() throws InterruptedException{
-            Thread.currentThread().wait();
-    }*/
+
+
 }

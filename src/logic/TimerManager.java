@@ -10,53 +10,63 @@ public class TimerManager {
 
     private final Object lock = new Object();
 
+    private boolean isPaused;
+
     public TimerManager(JLabel timeLabel) {
         Time time = new Time(0, 0, 0);
-        timer = new Timer(time, timeLabel);
+        timer = new Timer(time, timeLabel, this);
         threadTime = new Thread(timer, "TimeManager"); //Add timer as a task for the thread
 
         timeLabel.setText(Time.format(time));
     }
 
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public Object getLock() {
+        return lock;
+    }
     //POSSIBLE MISTAKES
 
     public void start(){
         if (threadTime.isAlive()){
-            System.out.print("is on the run\n");
+            System.out.println(isPaused);
             synchronized (lock) {
-                notify();
-                System.out.println("mmm");
-
+                if (isPaused) {
+                    isPaused = false;
+                    System.out.println("It's on the run");
+                    lock.notify();
+                }
             }
         }else {
+            System.out.println("It just started");
             threadTime.start();
-            System.out.print("it's started from zero\n");
         }
-
     }
 
     public void pause(){
-        System.out.print("it's paused\n");
-
-        //while (isPaused){
-            try {
-                synchronized (lock) {
-                    System.out.println("mm");
-                    threadTime.wait();
-                }
-            }catch (InterruptedException e) {
-                throw new RuntimeException(e);
-           }
+        synchronized (lock) {
+            isPaused = true;
+            System.out.println("It just paused");
+        }
     }
 
     public void restart() {
+        if (threadTime != null && threadTime.isAlive()) {
+            threadTime.interrupt();
 
-        threadTime.interrupt();
-        threadTime = new Thread(timer);
+            timer.reset();
+            timer.updateLabel();
+
+            threadTime = new Thread(timer, "TimeManager");
+
+            System.out.println("It's reset");
+            if (!isPaused) { //if the thread is reset while the thread is not paused, the thread continue...
+                threadTime.start();
+            }
+        }
     }
 
+
 }
-
-
-
-

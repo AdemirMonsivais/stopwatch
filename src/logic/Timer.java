@@ -22,10 +22,10 @@ public class Timer implements Runnable{
     public void run() {
         int iterations = 0;
         while(!Thread.currentThread().isInterrupted()){
-            synchronized (timerManager.getLock()) {
+            synchronized (timerManager.lock) {
                 while (timerManager.isPaused()) {
                     try {
-                        timerManager.getLock().wait();
+                        timerManager.lock.wait();
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         return;
@@ -58,8 +58,6 @@ public class Timer implements Runnable{
     public void reset(){
         time.setTime(0,0,0);
     }
-
-
 
     public void updateLabel(){
         SwingUtilities.invokeLater(()->{

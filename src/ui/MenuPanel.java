@@ -6,17 +6,18 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class MenuPanel extends JPanel implements ActionListener{
-    private StartPauseButton startPauseButton;
-    private JButton restartButton;
+    private final StartPauseButton startPauseButton;
+    private final JButton restartButton;
 
-    private TimerManager timerManager;
-    private JLabel timeLabel;
+    private final TimerManager timerManager;
 
     public MenuPanel(JLabel timeLabel){
         timerManager = new TimerManager(timeLabel);
@@ -24,14 +25,14 @@ public class MenuPanel extends JPanel implements ActionListener{
         setBackground(Color.decode("#404d4d"));
         setLayout(new FlowLayout());
 
-        restartButton = new JButton("\u21ba");
+        restartButton = new JButton("↺");
         restartButton.setFont(new Font("Digital / LCD Style Fonts", Font.PLAIN, 30));
         restartButton.setFocusPainted(false);
         restartButton.setBackground(Color.decode("#e9824e"));
         restartButton.setPreferredSize(new Dimension(70,50));
         restartButton.addActionListener(this);
 
-        //--------StartPauseBUtton---------"
+        //--------StartPauseButton---------"
         startPauseButton = new StartPauseButton();
         startPauseButton.addActionListener(this);
         //-------------------------

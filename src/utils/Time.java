@@ -11,20 +11,6 @@ public class Time {
         this.seconds = seconds;
     }
 
-    public Time(){
-        hours = 0;
-        minutes = 0;
-        seconds = 0;
-    }
-
-    public void setHours(int hours) {
-        this.hours = hours;
-    }
-
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
-    }
-
     public void setSeconds(int seconds) {
         this.seconds = seconds;
     }
